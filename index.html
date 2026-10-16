@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Mobile-first: viewport tag is required for correct scaling on phones/tablets -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Asad Computer & Training Center, Bhully Bazar, Thakurgaon. Computer training, admission, results and payments." />
+  <meta name="theme-color" content="#75210F" />
+  <title>Asad Computer & Training Center</title>
+
+  <!-- Fonts: Lora for headings, Hind Siliguri for body (supports Bangla + Latin) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Lora:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Brand tokens: Deep Red + White
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: { DEFAULT: '#75210F', dark: '#5a190b', tint: '#f7ece8' } },
+          fontFamily: {
+            heading: ['Lora', 'Georgia', 'serif'],
+            body: ['"Hind Siliguri"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Marquee: pure CSS, pauses on hover/touch, disabled for reduced-motion users */
+    .marquee-track { display: inline-block; white-space: nowrap; padding-left: 100%; animation: marquee 28s linear infinite; }
+    .marquee:hover .marquee-track, .marquee:active .marquee-track { animation-play-state: paused; }
+    @keyframes marquee { to { transform: translateX(-100%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track { animation: none; padding-left: 0; white-space: normal; }
+    }
+    /* Notice board: smooth touch scrolling on iOS/Android */
+    .notice-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    /* Shared text-input style for the login/registration forms */
+    .field { width:100%; height:3rem; padding:0 .75rem; border:1px solid #d4d4d4; border-radius:.5rem; }
+    .field:focus { border-color:#75210F; }
+    /* Visible keyboard focus everywhere */
+    :focus-visible { outline: 3px solid #f2b8a6; outline-offset: 2px; }
+  </style>
+</head>
+
+<body class="font-body text-neutral-800 bg-white antialiased">
+
+  <!-- ============ 1. URGENT ANNOUNCEMENT MARQUEE ============ -->
+  <!-- Edit the text below, or push live updates into #marqueeText with JS -->
+  <div class="marquee bg-white text-brand border-b-2 border-brand overflow-hidden" role="region" aria-label="Urgent announcements">
+    <div class="flex items-center">
+      <span class="shrink-0 bg-brand text-white text-xs sm:text-sm font-semibold px-3 py-2">Urgent</span>
+      <div class="overflow-hidden flex-1 py-2 text-sm sm:text-base font-medium">
+        <span id="marqueeText" class="marquee-track">
+          Admission for the new session is open. &nbsp;&bull;&nbsp; Final exam results will be published on the Result page. &nbsp;&bull;&nbsp; Pay fees online from the Payment page.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2. HEADER / BRANDING ============ -->
+  <!-- Background image: place your file next to this HTML as head_picture.jpg -->
+  <header class="relative bg-brand bg-cover bg-center" style="background-image:url('head_picture.jpg')">
+    <div class="absolute inset-0 bg-brand/70"></div><!-- overlay keeps title readable on any photo -->
+    <div class="relative max-w-6xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center text-center gap-3 sm:gap-4">
+      <!-- Logo: place your file next to this HTML as logo.png. Falls back to initials if missing -->
+      <img src="logo.png" alt="Asad Computer & Training Center logo"
+           class="h-20 w-20 sm:h-28 sm:w-28 rounded-full bg-white object-contain p-1 ring-4 ring-white/60"
+           onerror="this.outerHTML='<div class=&quot;h-20 w-20 sm:h-28 sm:w-28 rounded-full bg-white text-brand font-heading font-bold text-3xl sm:text-4xl flex items-center justify-center ring-4 ring-white/60&quot;>AC</div>'" />
+      <h1 class="font-heading font-bold text-white text-2xl sm:text-4xl lg:text-5xl leading-tight max-w-3xl">
+        Asad Computer &amp; Training Center
+      </h1>
+      <p class="text-white/90 text-sm sm:text-lg">Bhully Bazar, Thakurgaon</p>
+    </div>
+  </header>
+
+  <!-- ============ 3. NAVIGATION ============ -->
+  <nav class="bg-brand text-white sticky top-0 z-40 shadow-md" aria-label="Main navigation">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex items-center justify-between h-14">
+        <span class="font-heading font-semibold md:hidden">Menu</span>
+
+        <!-- Desktop links. Change href values to your real pages. -->
+        <ul class="hidden md:flex items-center gap-1 w-full justify-center" id="desktopMenu"></ul>
+
+        <!-- Hamburger (mobile only), 44px+ touch target -->
+        <button id="menuBtn" class="md:hidden h-11 w-11 flex items-center justify-center rounded hover:bg-brand-dark"
+                aria-expanded="false" aria-controls="mobileMenu" aria-label="Toggle menu">
+          <svg id="iconOpen" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="iconClose" class="h-6 w-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile collapsible menu -->
+    <ul id="mobileMenu" class="hidden md:hidden border-t border-white/20 bg-brand-dark px-2 py-2"></ul>
+  </nav>
+
+  <!-- ============ 5. MAIN CONTENT ============ -->
+  <!-- Mobile: single column. Desktop (lg): left = notices + history, right = directors -->
+  <main id="home" class="max-w-6xl mx-auto px-4 py-8 lg:py-12 grid gap-8 lg:grid-cols-3">
+
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Notice Board -->
+      <section aria-labelledby="noticeTitle" class="border border-brand/30 rounded-lg overflow-hidden">
+        <h2 id="noticeTitle" class="bg-brand text-white font-heading text-lg sm:text-xl px-4 py-3">Notice Board</h2>
+        <!-- Fixed height + overflow = scrollable, touch scroll supported -->
+        <ul id="noticeList" class="notice-scroll max-h-80 overflow-y-auto divide-y divide-brand/15" tabindex="0" aria-label="Scrollable list of notices"></ul>
+      </section>
+
+      <!-- Institution History -->
+      <section aria-labelledby="historyTitle">
+        <h2 id="historyTitle" class="font-heading text-brand text-xl sm:text-2xl mb-3">Our History</h2>
+        <div class="space-y-3 leading-relaxed max-w-prose">
+          <!-- Replace with your real history text -->
+          <p>Asad Computer &amp; Training Center was founded in Bhully Bazar to bring practical computer education to the young people of Thakurgaon.</p>
+          <p>Starting with a small lab and a handful of learners, the center now offers basic computer courses, office applications, graphic design and other skill training for students and job seekers in the region.</p>
+          <p>Our aim has stayed the same: affordable training, hands-on practice, and a certificate that helps students find work or start their own.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Leadership -->
+    <aside aria-labelledby="leadTitle" class="space-y-4">
+      <h2 id="leadTitle" class="font-heading text-brand text-xl sm:text-2xl">Our Directors</h2>
+      <div id="directorList" class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1"></div>
+    </aside>
+  </main>
+
+  <!-- ============ 6. FOOTER ============ -->
+  <footer id="contact" class="bg-brand text-white">
+    <div class="max-w-6xl mx-auto px-4 py-8 grid gap-6 sm:grid-cols-3 text-sm sm:text-base">
+      <div>
+        <h3 class="font-heading text-lg mb-2">Phone</h3>
+        <!-- tel: links let mobile users tap to call -->
+        <p><a class="underline underline-offset-2 py-1 inline-block" href="tel:01773733654">01773733654</a></p>
+        <p><a class="underline underline-offset-2 py-1 inline-block" href="tel:01864399871">01864399871</a></p>
+      </div>
+      <div>
+        <h3 class="font-heading text-lg mb-2">Email</h3>
+        <a class="underline underline-offset-2 break-all py-1 inline-block" href="mailto:bhulli.postoffice@gmail.com">bhulli.postoffice@gmail.com</a>
+      </div>
+      <div>
+        <h3 class="font-heading text-lg mb-2">Address</h3>
+        <address class="not-italic">Bottola, Bhully Bazar, Bhully, Thakurgaon.</address>
+      </div>
+    </div>
+    <div class="border-t border-white/20 text-center text-xs sm:text-sm py-3 px-4">
+      &copy; <span id="year"></span> Asad Computer &amp; Training Center. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- ============ LOGIN MODAL ============ -->
+  <div id="loginModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4"
+       role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between bg-brand text-white px-4 py-3 rounded-t-2xl">
+        <h2 id="loginTitle" class="font-heading text-lg">Login</h2>
+        <button id="closeLogin" class="h-10 w-10 text-2xl leading-none rounded hover:bg-brand-dark" aria-label="Close login">&times;</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="grid grid-cols-2 border-b border-brand/20" role="tablist">
+        <button role="tab" id="tabStudent" aria-selected="true" class="tab py-3 font-semibold border-b-4 border-brand text-brand">Student</button>
+        <button role="tab" id="tabAdmin" aria-selected="false" class="tab py-3 font-semibold border-b-4 border-transparent text-neutral-500">Institution / Admin</button>
+      </div>
+
+      <!-- Student panel: Login and Registration, switched by the buttons inside -->
+      <div id="studentPanel">
+        <form id="formStudent" class="p-4 space-y-4" novalidate>
+          <div>
+            <label for="studentId" class="block text-sm font-medium mb-1">Student ID or Email</label>
+            <input id="studentId" name="identifier" required autocomplete="username" class="field" />
+          </div>
+          <div>
+            <label for="studentPass" class="block text-sm font-medium mb-1">Password</label>
+            <input id="studentPass" name="password" type="password" required autocomplete="current-password" class="field" />
+          </div>
+          <p class="formMsg text-sm text-brand min-h-[1.25rem]" role="alert"></p>
+          <button type="submit" class="w-full h-12 bg-brand text-white font-semibold rounded-lg hover:bg-brand-dark">Log in as student</button>
+          <div class="flex items-center gap-3 text-xs text-neutral-500"><span class="h-px flex-1 bg-neutral-200"></span>New here?<span class="h-px flex-1 bg-neutral-200"></span></div>
+          <button type="button" data-switch="register" class="w-full h-12 border-2 border-brand text-brand font-semibold rounded-lg hover:bg-brand-tint">Student Registration</button>
+        </form>
+
+        <form id="formRegister" class="hidden p-4 space-y-3" novalidate>
+          <div>
+            <label for="regName" class="block text-sm font-medium mb-1">Full name</label>
+            <input id="regName" name="fullName" required autocomplete="name" class="field" />
+          </div>
+          <div>
+            <label for="regId" class="block text-sm font-medium mb-1">Student ID <span class="text-neutral-500 font-normal">(optional, auto-generated if blank)</span></label>
+            <input id="regId" name="studentId" autocomplete="off" maxlength="20" class="field" />
+          </div>
+          <div>
+            <label for="regMobile" class="block text-sm font-medium mb-1">Mobile number</label>
+            <input id="regMobile" name="mobile" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" required autocomplete="tel" class="field" />
+          </div>
+          <div>
+            <label for="regCourse" class="block text-sm font-medium mb-1">Course name</label>
+            <input id="regCourse" name="course" list="courseList" required class="field" />
+            <!-- Suggestions only. Edit to match your real courses -->
+            <datalist id="courseList"><option value="Basic Computer"><option value="Office Application"><option value="Graphic Design"><option value="Web Design"></datalist>
+          </div>
+          <div>
+            <label for="regEmail" class="block text-sm font-medium mb-1">Email</label>
+            <input id="regEmail" name="email" type="email" required autocomplete="email" class="field" />
+          </div>
+          <div>
+            <label for="regPass" class="block text-sm font-medium mb-1">Password</label>
+            <input id="regPass" name="password" type="password" required minlength="8" autocomplete="new-password" aria-describedby="passHint" class="field" />
+            <p id="passHint" class="text-xs text-neutral-500 mt-1">At least 8 characters, with a letter and a number.</p>
+          </div>
+          <p class="formMsg text-sm text-brand min-h-[1.25rem]" role="alert"></p>
+          <button type="submit" class="w-full h-12 bg-brand text-white font-semibold rounded-lg hover:bg-brand-dark">Create account</button>
+          <button type="button" data-switch="login" class="w-full h-11 text-brand font-semibold underline">Already registered? Log in</button>
+        </form>
+      </div>
+
+      <!-- Admin form -->
+      <form id="formAdmin" class="p-4 space-y-4 hidden" novalidate>
+        <div>
+          <label for="adminUser" class="block text-sm font-medium mb-1">Username</label>
+          <input id="adminUser" name="username" required autocomplete="username" class="w-full h-12 px-3 border border-neutral-300 rounded-lg focus:border-brand" />
+        </div>
+        <div>
+          <label for="adminPass" class="block text-sm font-medium mb-1">Password</label>
+          <input id="adminPass" name="password" type="password" required autocomplete="current-password" class="w-full h-12 px-3 border border-neutral-300 rounded-lg focus:border-brand" />
+        </div>
+        <p class="formMsg text-sm text-brand min-h-[1.25rem]" role="alert"></p>
+        <button type="submit" class="w-full h-12 bg-brand text-white font-semibold rounded-lg hover:bg-brand-dark">Log in as admin</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       SITE DATA: edit these arrays to update the content
+       ===================================================== */
+
+    // Menu items. "login" opens the modal; others link to pages/sections.
+    const MENU = [
+      { label: 'Home',      href: '#home' },
+      { label: 'Services',  href: 'services.html' },
+      { label: 'Forms',     href: 'forms.html' },
+      { label: 'Result',    href: 'result.html' },
+      { label: 'Admission', href: 'admission.html' },
+      { label: 'Payment',   href: 'payment.html' },
+      { label: 'Login',     href: '#', login: true }
+    ];
+
+    // Notices (newest first)
+    const NOTICES = [
+      { date: '2026-10-10', title: 'New session admission is open. Visit the center or use the Admission page.' },
+      { date: '2026-10-05', title: 'Monthly fee for October must be paid before the 25th.' },
+      { date: '2026-09-28', title: 'Basic Computer course exam routine has been published.' },
+      { date: '2026-09-20', title: 'Certificates for the last batch are ready for collection.' },
+      { date: '2026-09-12', title: 'Center will remain closed on public holidays.' },
+      { date: '2026-09-01', title: 'Free orientation class for new learners every Friday.' }
+    ];
+
+    // Directors. Put photos next to this file, or use full URLs.
+    const DIRECTORS = [
+      { name: 'Director Name 1', role: 'Founder & Director', photo: 'director1.jpg', bio: 'Leads the center and its training programs. Add a short biography here.' },
+      { name: 'Director Name 2', role: 'Academic Director', photo: 'director2.jpg', bio: 'Oversees courses and instructors. Add a short biography here.' },
+      { name: 'Director Name 3', role: 'Administrative Director', photo: 'director3.jpg', bio: 'Manages admission and student support. Add a short biography here.' }
+    ];
+
+    /* ---------------- Helpers ---------------- */
+    const $ = (id) => document.getElementById(id);
+    // Escape text before inserting as HTML (prevents injection if data ever comes from a server)
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    /* ---------------- Render menus ---------------- */
+    const linkCls = 'block px-4 py-3 rounded font-medium hover:bg-brand-dark';
+    function menuItem(m, extra) {
+      return `<li><a href="${m.href}" ${m.login ? 'data-login="1"' : ''} class="${linkCls} ${extra}">${m.label}</a></li>`;
+    }
+    $('desktopMenu').innerHTML = MENU.map((m) => menuItem(m, '')).join('');
+    $('mobileMenu').innerHTML  = MENU.map((m) => menuItem(m, 'text-base')).join('');
+
+    /* ---------------- Hamburger toggle ---------------- */
+    const menuBtn = $('menuBtn'), mobileMenu = $('mobileMenu');
+    function setMenu(open) {
+      mobileMenu.classList.toggle('hidden', !open);
+      $('iconOpen').classList.toggle('hidden', open);
+      $('iconClose').classList.toggle('hidden', !open);
+      menuBtn.setAttribute('aria-expanded', open);
+    }
+    menuBtn.addEventListener('click', () => setMenu(mobileMenu.classList.contains('hidden')));
+    mobileMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+
+    /* ---------------- Notices ---------------- */
+    $('noticeList').innerHTML = NOTICES.map((n) => `
+      <li class="px-4 py-3">
+        <time class="block text-xs text-neutral-500" datetime="${esc(n.date)}">${new Date(n.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
+        <p class="mt-0.5">${esc(n.title)}</p>
+      </li>`).join('');
+
+    /* ---------------- Directors ---------------- */
+    $('directorList').innerHTML = DIRECTORS.map((d) => {
+      const initials = d.name.split(' ').map((w) => w[0]).slice(0, 2).join('');
+      return `
+      <article class="border border-brand/30 rounded-lg p-4 flex flex-col items-center text-center lg:flex-row lg:text-left lg:items-start gap-3">
+        <img src="${esc(d.photo)}" alt="Photo of ${esc(d.name)}" loading="lazy"
+             class="h-24 w-24 shrink-0 rounded-full object-cover bg-brand-tint"
+             onerror="this.outerHTML='<div class=&quot;h-24 w-24 shrink-0 rounded-full bg-brand-tint text-brand font-heading font-bold text-2xl flex items-center justify-center&quot;>${esc(initials)}</div>'" />
+        <div>
+          <h3 class="font-heading font-semibold text-brand text-lg leading-snug">${esc(d.name)}</h3>
+          <p class="text-sm font-medium text-neutral-600">${esc(d.role)}</p>
+          <p class="text-sm mt-2 leading-relaxed">${esc(d.bio)}</p>
+        </div>
+      </article>`;
+    }).join('');
+
+    /* ---------------- Login modal ---------------- */
+    const modal = $('loginModal');
+    function openLogin() { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); setMenu(false); $('studentId').focus(); }
+    function closeLogin() { modal.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); }
+
+    document.addEventListener('click', (e) => {
+      const trigger = e.target.closest('[data-login]');
+      if (trigger) { e.preventDefault(); getAuth() ? logout() : openLogin(); }
+    });
+    $('closeLogin').addEventListener('click', closeLogin);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeLogin(); }); // click outside
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLogin(); });
+
+    // Tabs: Student / Admin
+    function showTab(which) {
+      const student = which === 'student';
+      $('studentPanel').classList.toggle('hidden', !student);
+      $('formAdmin').classList.toggle('hidden', student);
+      [['tabStudent', student], ['tabAdmin', !student]].forEach(([id, on]) => {
+        const t = $(id);
+        t.setAttribute('aria-selected', on);
+        t.className = 'tab py-3 font-semibold border-b-4 ' + (on ? 'border-brand text-brand' : 'border-transparent text-neutral-500');
+      });
+    }
+    $('tabStudent').addEventListener('click', () => showTab('student'));
+    $('tabAdmin').addEventListener('click', () => showTab('admin'));
+
+    // Student panel: switch between Login and Registration
+    function showStudentMode(mode) {
+      $('formStudent').classList.toggle('hidden', mode !== 'login');
+      $('formRegister').classList.toggle('hidden', mode !== 'register');
+    }
+    document.querySelectorAll('[data-switch]').forEach((b) =>
+      b.addEventListener('click', () => showStudentMode(b.dataset.switch)));
+
+    /* =====================================================
+       AUTH: talks to the Node/Express API (see /backend)
+       ===================================================== */
+    // Same origin when Express serves this page; falls back to localhost when opened as a file
+    const API_BASE = location.protocol === 'file:' ? 'http://localhost:5000' : '';
+    const AUTH_KEY = 'actc_auth';
+
+    // Returns { token, role, user } or null. Expired tokens are cleared automatically.
+    // Note: localStorage is readable by any script on the page, so keep the site free of untrusted scripts.
+    function getAuth() {
+      try {
+        const a = JSON.parse(localStorage.getItem(AUTH_KEY));
+        if (!a || !a.token) return null;
+        const payload = JSON.parse(atob(a.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (payload.exp * 1000 < Date.now()) { localStorage.removeItem(AUTH_KEY); return null; }
+        return a;
+      } catch { return null; }
+    }
+    const saveAuth = (a) => localStorage.setItem(AUTH_KEY, JSON.stringify(a));
+    function logout() { localStorage.removeItem(AUTH_KEY); updateAuthUI(); }
+
+    // Menu shows "Login" or "Logout" depending on auth state
+    function updateAuthUI() {
+      const a = getAuth();
+      document.querySelectorAll('[data-login]').forEach((el) => {
+        el.textContent = a ? 'Logout' : 'Login';
+        el.title = a ? 'Signed in as ' + (a.user.fullName || a.user.username) : '';
+      });
+    }
+
+    // POST JSON and return parsed data; throws Error with a readable message
+    async function postJSON(path, data) {
+      let res;
+      try {
+        res = await fetch(API_BASE + path, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+        });
+      } catch { throw new Error('Cannot reach the server. Check your connection and try again.'); }
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.message || 'Something went wrong. Try again.');
+      return json;
+    }
+
+    function showMsg(form, text, ok) {
+      const m = form.querySelector('.formMsg');
+      m.textContent = text;
+      m.className = 'formMsg text-sm min-h-[1.25rem] ' + (ok ? 'text-green-700' : 'text-brand');
+    }
+
+    // Shared submit flow: disable button, call API, show result
+    async function submitForm(form, path, buildBody, onSuccess) {
+      const btn = form.querySelector('button[type="submit"]'), label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Please wait...'; showMsg(form, '', true);
+      try { onSuccess(await postJSON(path, buildBody())); }
+      catch (err) { showMsg(form, err.message, false); }
+      finally { btn.disabled = false; btn.textContent = label; }
+    }
+
+    // After a successful login: store state, update menu, close the modal.
+    // Hook: redirect here, e.g. window.location = role === 'admin' ? 'admin.html' : 'student.html'
+    function finishLogin(form, auth, welcome) {
+      saveAuth(auth);
+      form.reset();
+      showMsg(form, welcome, true);
+      updateAuthUI();
+      setTimeout(closeLogin, 900);
+    }
+
+    $('formStudent').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      submitForm(form, '/api/auth/student-login',
+        () => ({ identifier: $('studentId').value.trim(), password: $('studentPass').value }),
+        (d) => finishLogin(form, { token: d.token, role: 'student', user: d.student }, 'Welcome, ' + d.student.fullName + '!'));
+    });
+
+    $('formRegister').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      submitForm(form, '/api/auth/register',
+        () => Object.fromEntries(new FormData(form)),
+        (d) => {
+          form.reset();
+          // Return to login with the new ID filled in
+          showStudentMode('login');
+          $('studentId').value = d.student.studentId;
+          showMsg($('formStudent'), 'Registered! Your Student ID is ' + d.student.studentId + '. Enter your password to log in.', true);
+          $('studentPass').focus();
+        });
+    });
+
+    $('formAdmin').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      submitForm(form, '/api/auth/admin-login',
+        () => ({ username: $('adminUser').value.trim(), password: $('adminPass').value }),
+        (d) => finishLogin(form, { token: d.token, role: 'admin', user: d.admin }, 'Welcome, ' + d.admin.username + '!'));
+    });
+
+    updateAuthUI();
+    $('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
